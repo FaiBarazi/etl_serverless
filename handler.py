@@ -11,6 +11,7 @@ https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
 
 import json
 import boto3
+import os
 
 
 def extract(event, context):
@@ -22,19 +23,20 @@ def extract(event, context):
         context(obj): context object when lambda runs.
     """
     print('what is going on')
+    print(event)
+    dst_bucket = os.environ['S3_DST_BUCKET']
     s3 = boto3.resource('s3')
-    event_records_string = event['Records'][0]['body']
-    event_records_dict = json.loads(event_records_string)
+    s3_event = event['Records'][0]['s3']
 
-    src_bucket_name = event_records_dict['Records'][0]['s3']['bucaket']['name']
-    src_file_name = event_records_dict['Records'][0]['s3']['object']['key']
+    src_bucket = s3_event['bucket']['name']
+    src_file = s3_event['object']['key']
 
     copy_source = {
-      'Bucket': src_bucket_name,
-      'Key': src_file_name
+      'Bucket': src_bucket,
+      'Key': src_file
     }
-    dst_bucket = s3.Bucket('data-rio-1984')
-    dst_bucket.copy(copy_source, f'raw/input/{src_file_name}')
+    dst_bucket = s3.Bucket(dst_bucket)
+    dst_bucket.copy(copy_source, f'raw/input/{src_file}')
 
 
 def trasnform_load(even, context):
