@@ -24,6 +24,20 @@ provider:
   name: aws
   runtime: python3.7
   stage: dev
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:DeleteObject
+        - s3:GetObject
+      Resource:
+        - 'arn:aws:s3:::${self:custom.src_bucket}/*'
+        - 'arn:aws:s3:::${self:custom.dst_bucket}/*'
+  environment:
+    S3_SRC_BUCKET: ${self:custom.src_bucket}
+    S3_DST_BUCKET: ${self:custom.dst_bucket}
+  cfnRole: arn:aws:iam::593913160925:role/sls-cnf-role
+
 
 # you can overwrite defaults here
 
@@ -45,6 +59,7 @@ provider:
 #          - "Ref" : "ServerlessDeploymentBucket"
 #          - "/*"
 
+
 # you can define service wide environment variables here
 #  environment:
 #    variable1: value1
@@ -64,16 +79,16 @@ functions:
     handler: handler.extract
     events:
       - s3:
-        bucket: raw-data-upload
+        bucket: ${self:provider.environment.S3_SRC_BUCKET}
         event: s3:ObjectCreated:*
-        rules:
-          - suffix: .csv
+        # rules:
+        #   - suffix: .csv
 
   transform_load:
     handler: handler.transform_load
     events:
       - s3:
-        bucket: data-rio-1984
+        bucket: ${self:custom.dst_bucket}
         event: s3:ObjectCreated:*
         rules:
           - prefix: raw/input/
@@ -119,23 +134,35 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+custom:
+  src_bucket: ${self:service}-${self:provider.stage}-uploads
+  dst_bucket: ${self:service}-${self:provider.stage}-data
+
+  pythonRequirements:
+    zip: true
+
+
+resources:
+ Resources:
+    UploadBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.src_bucket}
+
+    DataBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.dst_bucket}
+
+ # Outputs:
+ #    NewOutput:
+ #      Description: "bucket to upload to"
+ #      Value: "Some output value"
 
 
 
 plugins:
   - serverless-python-requirements
 
-custom:
-  pythonRequirements:
-    zip: true
+
 
