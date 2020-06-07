@@ -12,6 +12,13 @@ https://docs.aws.amazon.com/lambda/latest/dg/python-context.html
 import json
 import boto3
 import os
+import pandas as pd
+from sqlalchemy import create_engine
+from sqlalchemy.sql import text
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
 
 def extract(event, context):
@@ -41,4 +48,41 @@ def extract(event, context):
 
 def trasnform_load(even, context):
     """Transfrom the data obtained after the extract and load it into a DB."""
-    pass
+    s3 = boto3.resource('s3')
+    s3_event = event['Records'][0]['s3']
+
+    # Source is the raw data in this case.
+    src_bucket = s3_event['bucket']['name']
+    src_file = s3_event['object']['key']
+
+    # create engine to connect to RDS postgres
+    engine = create_engine(create_engine('postgresql://user:password@host/database'))
+    # Read csv to a pandas df
+    df = pd.read_csv(f'{path_to_csv}')
+
+    # Do dataframe manipulation here
+    # 1: Time to iso fromat
+    # 2: For each ship grouped by CallSign,
+    #    if the MoveStatus is Under way using engine, fill in any missing or zero speeds with the average of all speeds for that CallSign
+    # 3: Create a new feature called BeamRatio calculated as Beam / Length (Beam divided by Length)
+
+    # We can do this or do engine.execute("""SQL command""")
+    with engine.connect() as con:
+        # Create table of it doesn't exist and drop
+        statement = text("""SQL statement""")
+        con.execute(statement, *params)
+
+    # Note that pandas Dataframe to_sql takes either an SQLaclhemy engine or sqlite.
+    df.to_sql('table_name', con=engine)
+
+
+
+
+
+
+
+
+
+
+
+
