@@ -38,12 +38,15 @@ provider:
   environment:
     S3_SRC_BUCKET: ${self:custom.src_bucket}
     S3_DST_BUCKET: ${self:custom.dst_bucket}
+    DB_Name: ${self:custom.db_name}
+    DB_User: 'rio'
+    DB_Pass: 'rio12345'
 
 
 # Events handler function. Define which events will trigger which functions from the handler.py
 functions:
   extract:
-    handler: handler.extract
+    handler: extract.extract
     events:
       - s3:
         bucket: ${self:provider.environment.S3_SRC_BUCKET}
@@ -52,11 +55,11 @@ functions:
           - suffix: .csv
 
   transform_load:
-    handler: handler.transform_load
+    handler: transform.transform_load
     events:
       - s3:
         bucket: ${self:provider.environment.S3_DST_BUCKET}
-        event: s3:ObjectCreated:*
+        event: s3:ObjectCreated:Put
         rules:
           - prefix: raw/input/
           - suffix: .csv
@@ -68,8 +71,8 @@ custom:
   deletion_policy: Delete
   db_name: ${self:service}_${self:provider.stage}
   db_id: rio-postgres
-  postgres_table: ${self:custom.stack_name}
 
+  # Zip the python requirements as lambda can handle a specific code size.
   pythonRequirements:
     zip: true
 
@@ -92,17 +95,13 @@ resources:
       Properties:
         DBName: ${self:custom.db_name}
         DBInstanceIdentifier: ${self:custom.db_id}
+        # for info about DB size based on engine : https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html
         AllocatedStorage: 5
         DBInstanceClass: db.t2.micro
         Engine: postgres
-        MasterUsername: 'rio'
-        MasterUserPassword: 'rio12345'
-
-
+        MasterUsername: ${self:provider.environment.DB_User}
+        MasterUserPassword: ${self:provider.environment.DB_Pass}
 
 
 plugins:
   - serverless-python-requirements
-
-
-
