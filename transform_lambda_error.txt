@@ -1,0 +1,46 @@
+[ERROR] ImportError: Unable to import required dependencies:
+numpy:
+
+IMPORTANT: PLEASE READ THIS FOR ADVICE ON HOW TO SOLVE THIS ISSUE!
+
+Importing the numpy C-extensions failed. This error can happen for
+many reasons, often due to issues with your setup or how NumPy was
+installed.
+
+We have compiled some common reasons and troubleshooting tips at:
+
+ttps://numpy.org/devdocs/user/troubleshooting-importerror.html
+
+Please note and check the following:
+
+  * The Python version is: Python3.7 from "/var/lang/bin/python3.7"
+  * The NumPy version is: "1.18.5"
+
+and make sure that they are the versions you expect.
+Please carefully study the documentation linked above for further help.
+
+Original error was: No module named 'numpy.core._multiarray_umath'
+
+Traceback (most recent call last):
+  File "/var/task/serverless_sdk/__init__.py", line 134, in wrapped_handler
+    return user_handler(event, context)
+  File "/var/task/s_transform_load.py", line 24, in error_handler
+    raise e
+  File "/var/task/s_transform_load.py", line 19, in <module>
+    user_handler = serverless_sdk.get_user_handler('transform.transform_load')
+  File "/var/task/serverless_sdk/__init__.py", line 56, in get_user_handler
+    user_module = import_module(user_module_name)
+  File "/var/lang/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/var/task/transform.py", line 18, in <module>
+    import pandas as pd
+  File "/tmp/sls-py-req/pandas/__init__.py", line 17, in <module>
+    "Unable to import required dependencies:\n" + "\n".join(missing_dependencies)
+END RequestId: 766aad09-2034-4d0d-8396-72e207e331be
+REPORT RequestId: 766aad09-2034-4d0d-8396-72e207e331be	Duration: 10.54 ms	Billed Duration: 100 ms	Memory Size: 1024 MB	Max Memory Used: 350 MB	Init Duration: 2821.74 ms
