@@ -46,7 +46,7 @@ provider:
 # Events handler function. Define which events will trigger which functions from the handler.py
 functions:
   extract:
-    handler: extract.extract
+    handler: handlers/extract.extract
     events:
       - s3:
         bucket: ${self:provider.environment.S3_SRC_BUCKET}
@@ -55,7 +55,7 @@ functions:
           - suffix: .csv
 
   transform_load:
-    handler: transform.transform_load
+    handler: handlers/transform.transform_load
     events:
       - s3:
         bucket: ${self:provider.environment.S3_DST_BUCKET}
