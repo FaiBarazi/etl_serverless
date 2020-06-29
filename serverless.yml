@@ -74,7 +74,9 @@ custom:
 
   # Zip the python requirements as lambda can handle a specific code size.
   pythonRequirements:
+    dockerizePip: non-linux
     zip: true
+
 
 # AWS resources including
 resources:
