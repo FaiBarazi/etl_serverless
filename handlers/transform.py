@@ -21,7 +21,7 @@ import boto3
 import pandas as pd
 
 
-def trasnform_load(event, context):
+def transform_load(event, context):
 
     """Transfrom the data obtained after the extract and load it into a DB."""
     s3 = boto3.resource('s3')
