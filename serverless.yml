@@ -39,8 +39,8 @@ provider:
     S3_SRC_BUCKET: ${self:custom.src_bucket}
     S3_DST_BUCKET: ${self:custom.dst_bucket}
     DB_Name: ${self:custom.db_name}
-    DB_User: 'rio'
-    DB_Pass: 'rio12345'
+    DB_User: <db_name>
+    DB_Pass: <db_pass>
 
 
 # Events handler function. Define which events will trigger which functions from the handler.py
